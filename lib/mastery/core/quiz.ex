@@ -83,7 +83,7 @@ defmodule Mastery.Core.Quiz do
     Map.put(quiz, field, [template | list])
   end
 
-  defp reset_template_cycle(%{tenplates: templates, used: used} = quiz) when map_size(templates) == 0 do
+  defp reset_template_cycle(%{templates: templates, used: used} = quiz) when map_size(templates) == 0 do
     %__MODULE__{
       quiz |
         templates: Enum.group_by(used, fn template -> template.category end ),

@@ -62,5 +62,11 @@ defmodule QuizBuilders do
     |> template_fields()
     |> Template.new()
     |> Question.new()
-  end  
+  end
+  
+  def build_quiz_with_two_templates(quiz_overrides \\ []) do
+    build_quiz(quiz_overrides)
+    |> Quiz.add_template(template_fields())
+    |> Quiz.add_template(double_digit_addition_template_fields())
+  end
 end
