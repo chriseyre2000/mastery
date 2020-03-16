@@ -6,7 +6,7 @@ defmodule Mastery.Examples.Maths do
       name: :single_digit_addition,
       category: :addition,
       instructions: "Add the numbers",
-      raw: "<%= left %> + <%= right %>",
+      raw: "<%= @left %> + <%= @right %>",
       generators: addition_generators(),
       checker: &addition_checker/2
     ]
@@ -31,5 +31,5 @@ defmodule Mastery.Examples.Maths do
     |> Quiz.new()
     |> Quiz.add_template(template_fields())
   end
-  
+
 end
