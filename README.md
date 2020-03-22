@@ -1,21 +1,15 @@
 # Mastery
 
-**TODO: Add description**
+This is an attempt to work through the major example project from
 
-## Installation
+`Designing Elixir Systems with OTP` (https://pragprog.com/book/jgotp/designing-elixir-systems-with-otp)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `mastery` to your list of dependencies in `mix.exs`:
+I have been following through the book working on the code snippets.
 
-```elixir
-def deps do
-  [
-    {:mastery, "~> 0.1.0"}
-  ]
-end
-```
+The only changes that I have made:
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/mastery](https://hexdocs.pm/mastery).
+- Mastery.Examples.Maths is the correct name for the example project.
+- I am using docker-compose.yml for the test databases.
+
+This is being blogged about on https://devrants.blog
 
