@@ -3,7 +3,6 @@ defmodule Mastery.Boundary.QuizManager do
   use GenServer
 
   def init(quizzes) when is_map(quizzes) do
-    IO.puts "QuizManager starting"
     {:ok, quizzes}
   end
 
@@ -21,11 +20,9 @@ defmodule Mastery.Boundary.QuizManager do
   end
   
   def handle_call({:add_template, quiz_title, template_fields}, _from, quizzes) do
-    IO.puts("add template in quiz_manager #{quiz_title}")
     new_quizzes = Map.update!(quizzes, 
                               quiz_title, 
                               fn quiz -> Quiz.add_template(quiz, template_fields) end)
-    IO.puts('end of add template in quiz_manager')                          
     {:reply, :ok, new_quizzes}
   end
   

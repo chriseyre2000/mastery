@@ -15,7 +15,6 @@ defmodule Mastery.Core.Quiz do
   end
 
   def add_template(quiz, fields) do
-    IO.puts('add template in quiz')
     template = Template.new(fields)
     templates = update_in(
       quiz.templates,

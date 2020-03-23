@@ -20,14 +20,12 @@ defmodule Mastery.Boundary.Proctor do
   end
   
   def handle_info(:timeout, quizzes) do
-    IO.puts("Proctor timeout")
     now = DateTime.utc_now
     remaining_quizzes = start_quizzes(quizzes, now)
     build_reply_with_timeout({:noreply}, remaining_quizzes, now)
   end
   
   def handle_info({:end_quiz, title}, quizzes) do
-    IO.puts("Proctor end quiz")
     QuizManager.remove_quiz(title)
     title 
     |> QuizSession.active_sessions_for()

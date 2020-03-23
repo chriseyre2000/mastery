@@ -2,7 +2,7 @@ defmodule MasteryPersistence.Repo.Migrations.CreateResponses do
   use Ecto.Migration
 
   def change do
-    create table(:reponses) do
+    create table(:responses) do
       add :quiz_title, :string, null: false
       add :template_name, :string, null: false
       add :to, :text, null: false

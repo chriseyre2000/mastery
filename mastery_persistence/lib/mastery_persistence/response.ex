@@ -18,6 +18,6 @@ defmodule MasteryPersistence.Response do
   def record_changeset(fields) do
     %__MODULE__{}
     |> cast(fields, @mastery_fields ++ @timestamps)
-    |> validate_required(fields, @mastery_fields ++ @timestamps)
+    |> validate_required(@mastery_fields ++ @timestamps)
   end
 end

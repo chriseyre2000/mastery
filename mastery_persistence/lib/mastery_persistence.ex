@@ -2,7 +2,7 @@ defmodule MasteryPersistence do
   import Ecto.Query, only: [from: 2]
   alias MasteryPersistence.{Response, Repo}
 
-  def record_response(response, in_transaction \\ fn _response -> :ok end) do
+  def record_response(response, in_transaction \\ fn _response -> :ok end) do    
     {:ok, result} = Repo.transaction(fn ->
       %{
         quiz_title: to_string(response.quiz_title),
@@ -16,6 +16,7 @@ defmodule MasteryPersistence do
       }
       |> Response.record_changeset
       |> Repo.insert!
+      |> IO.inspect()
       in_transaction.(response)
     end)
     result
@@ -30,7 +31,6 @@ defmodule MasteryPersistence do
       group_by: [r.quiz_title, r.email]
     )
     |> Repo.all
-    |> Enum.into(%{})
+    |> Enum.into(Map.new)
   end  
-
 end

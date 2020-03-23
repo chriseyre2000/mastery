@@ -38,7 +38,7 @@ defmodule Mastery.Boundary.QuizSession do
 
     fun.(response, fn r -> 
       quiz
-      |> Quiz.answer_qustion(r)
+      |> Quiz.answer_question(r)
       |> Quiz.select_question()
     end)
     |> maybe_finish(email)
