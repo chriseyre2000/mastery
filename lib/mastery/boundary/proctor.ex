@@ -13,9 +13,10 @@ defmodule Mastery.Boundary.Proctor do
 
   def handle_call({:schedule_quiz, quiz}, _from, quizzes) do
     now = DateTime.utc_now
-    ordered_quizzes = [quiz | quizzes]
-    |> start_quizzes(now)
-    |> Enum.sort( fn a, b -> date_time_less_than_or_equal?(a.start_at, b.start_at) end)
+    ordered_quizzes = 
+      [quiz | quizzes]
+      |> start_quizzes(now)
+      |> Enum.sort( fn a, b -> date_time_less_than_or_equal?(a.start_at, b.start_at) end)
     build_reply_with_timeout({:reply, :ok}, ordered_quizzes, now)
   end
   
@@ -25,12 +26,13 @@ defmodule Mastery.Boundary.Proctor do
     build_reply_with_timeout({:noreply}, remaining_quizzes, now)
   end
   
-  def handle_info({:end_quiz, title}, quizzes) do
+  def handle_info({:end_quiz, title, notify_pid}, quizzes) do
     QuizManager.remove_quiz(title)
     title 
     |> QuizSession.active_sessions_for()
     |> QuizSession.end_sessions()
     Logger.info "Stopped quiz #{title}."
+    notify_stopped(notify_pid, title)
     handle_info(:timeout, quizzes)
   end  
 
@@ -54,16 +56,32 @@ defmodule Mastery.Boundary.Proctor do
 
   defp date_time_less_than_or_equal?(a, b) do
     DateTime.compare(a, b) in ~w[lt eq]a
-  end  
+  end
+  
+  defp notify_start(%{notify_pid: nil}), do: nil
+  defp notify_start(quiz) do 
+    send(quiz.notify_pid, {:started, quiz.fields.title})
+  end
+
+  defp notify_stopped(nil, _title), do: nil
+  defp notify_stopped(pid, title), do:
+    send(pid, {:stopped, title})
   
   ## API
 
-  def schedule_quiz(proctor \\ __MODULE__, quiz, temps, start_at, end_at) do
+  def schedule_quiz(
+    proctor \\ __MODULE__, 
+    quiz, 
+    temps, 
+    start_at, 
+    end_at,
+    notify_pid) do
     quiz = %{
       fields: quiz,
       templates: temps,
       start_at: start_at,
-      end_at: end_at
+      end_at: end_at,
+      notify_pid: notify_pid
     }
     GenServer.call(proctor, {:schedule_quiz, quiz})
   end
@@ -71,18 +89,25 @@ defmodule Mastery.Boundary.Proctor do
   def start_quizzes(quizzes, now) do
     {ready, not_ready} = Enum.split_while(quizzes, 
         fn quiz -> date_time_less_than_or_equal?(quiz.start_at, now) end)
-    Enum.each(ready, fn quiz-> start_quiz(quiz, now) end)
+    Enum.each(ready, fn quiz-> 
+      start_quiz(quiz, now) end)
     not_ready
   end
   
   def start_quiz(quiz, now) do
     Logger.info "Starting quiz #{quiz.fields.title}..."
+    notify_start(quiz)
+
     QuizManager.build_quiz(quiz.fields)
-    Enum.each(quiz.templates, &QuizManager.add_template(quiz.fields.title, &1))
+    Enum.each(quiz.templates, &add_template(quiz, &1))
     timeout = DateTime.diff(quiz.end_at, now, :millisecond)
-    Process.send_after(self(), {:end_quiz, quiz.fields.title}, timeout)
+    Process.send_after(self(), {:end_quiz, quiz.fields.title, 
+      quiz.notify_pid}, timeout)
   end  
-  
-  
+
+  def add_template(quiz, template) do
+    QuizManager.add_template(quiz.fields.title, template)
+  end  
+
   
 end  
